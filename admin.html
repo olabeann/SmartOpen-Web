@@ -1,0 +1,648 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>050 통화관리 Admin</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0F1117;--bg2:#161B26;--bg3:#1E2535;--surface:#1E2535;--surface2:#252D40;
+  --border:rgba(255,255,255,0.07);--border2:rgba(255,255,255,0.12);
+  --blue:#3B82F6;--blue2:#2563EB;--blue-light:rgba(59,130,246,0.12);
+  --green:#10B981;--green-light:rgba(16,185,129,0.12);
+  --red:#EF4444;--red-light:rgba(239,68,68,0.12);
+  --yellow:#F59E0B;--yellow-light:rgba(245,158,11,0.12);
+  --purple:#8B5CF6;--purple-light:rgba(139,92,246,0.12);
+  --t1:#F1F5F9;--t2:#94A3B8;--t3:#475569;
+  --sidebar:220px;--header:56px;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--t1);font-size:13px;display:flex;height:100vh;overflow:hidden;}
+.sidebar{width:var(--sidebar);background:var(--bg2);border-right:1px solid var(--border);display:flex;flex-direction:column;flex-shrink:0;overflow-y:auto;}
+.sidebar::-webkit-scrollbar{width:0;}
+.sb-logo{padding:16px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;}
+.sb-logo-mark{width:30px;height:30px;background:var(--blue);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:900;color:#fff;flex-shrink:0;}
+.sb-logo-text{font-size:13px;font-weight:700;color:var(--t1);}
+.sb-logo-badge{font-size:9px;background:var(--blue-light);color:var(--blue);padding:1px 6px;border-radius:4px;margin-left:auto;border:1px solid rgba(59,130,246,0.2);}
+.sb-nav{flex:1;padding:8px;}
+.sb-sec{font-size:9px;font-weight:700;color:var(--t3);letter-spacing:1.5px;padding:12px 8px 4px;text-transform:uppercase;}
+.sb-item{display:flex;align-items:center;gap:9px;padding:9px 10px;border-radius:8px;cursor:pointer;transition:all 0.15s;font-size:12px;font-weight:500;color:var(--t2);border:none;background:transparent;font-family:inherit;width:100%;text-align:left;}
+.sb-item:hover{background:var(--bg3);color:var(--t1);}
+.sb-item.active{background:var(--blue-light);color:var(--blue);font-weight:600;}
+.sb-badge{margin-left:auto;font-size:9px;font-weight:700;background:var(--red);color:#fff;padding:1px 5px;border-radius:10px;}
+.sb-badge.b{background:var(--blue);}
+.sb-footer{padding:10px 8px;border-top:1px solid var(--border);}
+.sb-user{display:flex;align-items:center;gap:9px;padding:9px 10px;border-radius:8px;cursor:pointer;}
+.sb-user:hover{background:var(--bg3);}
+.sb-av{width:30px;height:30px;border-radius:50%;background:linear-gradient(135deg,var(--blue),var(--purple));display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#fff;flex-shrink:0;}
+.sb-un{font-size:12px;font-weight:600;color:var(--t1);}
+.sb-ur{font-size:10px;color:var(--t3);}
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden;}
+.header{height:var(--header);background:var(--bg2);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 22px;flex-shrink:0;}
+.hdr-title{font-size:15px;font-weight:700;color:var(--t1);}
+.hdr-right{display:flex;align-items:center;gap:10px;}
+.hdr-search{display:flex;align-items:center;gap:8px;background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:7px 12px;width:190px;transition:all 0.2s;}
+.hdr-search:focus-within{border-color:var(--blue);}
+.hdr-search input{background:none;border:none;outline:none;font-size:12px;color:var(--t1);font-family:inherit;flex:1;}
+.hdr-search input::placeholder{color:var(--t3);}
+.hbtn{width:34px;height:34px;border-radius:8px;background:var(--bg3);border:1px solid var(--border);color:var(--t2);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:14px;transition:all 0.15s;position:relative;}
+.hbtn:hover{border-color:var(--border2);color:var(--t1);}
+.ndot{position:absolute;top:5px;right:5px;width:7px;height:7px;border-radius:50%;background:var(--red);border:2px solid var(--bg2);}
+.content{flex:1;overflow-y:auto;padding:22px;}
+.content::-webkit-scrollbar{width:4px;}
+.content::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px;}
+.page{display:none;}
+.page.active{display:block;}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:12px;overflow:hidden;}
+.card-hd{padding:14px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
+.card-title{font-size:13px;font-weight:700;color:var(--t1);}
+.card-body{padding:16px 18px;}
+.card-btn{font-size:11px;color:var(--blue);background:none;border:none;font-family:inherit;cursor:pointer;padding:4px 10px;border-radius:6px;}
+.card-btn:hover{background:var(--blue-light);}
+.kpi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:18px;}
+.kpi{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:16px;}
+.kpi-top{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:12px;}
+.kpi-icon{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:16px;}
+.trend{font-size:10px;font-weight:600;padding:3px 7px;border-radius:6px;}
+.up{background:var(--green-light);color:var(--green);}
+.dn{background:var(--red-light);color:var(--red);}
+.kpi-num{font-size:26px;font-weight:900;color:var(--t1);letter-spacing:-1px;line-height:1;margin-bottom:3px;}
+.kpi-label{font-size:11px;color:var(--t3);}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:18px;}
+.g31{display:grid;grid-template-columns:2fr 1fr;gap:12px;margin-bottom:18px;}
+.fbar{display:flex;align-items:center;gap:8px;margin-bottom:14px;flex-wrap:wrap;}
+.fi{display:flex;align-items:center;gap:8px;background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:7px 12px;transition:all 0.2s;}
+.fi:focus-within{border-color:var(--blue);}
+.fi input{background:none;border:none;outline:none;font-size:12px;color:var(--t1);font-family:inherit;width:160px;}
+.fi input::placeholder{color:var(--t3);}
+.fsel{padding:7px 12px;border:1px solid var(--border);border-radius:8px;background:var(--surface);font-size:12px;font-family:inherit;color:var(--t2);outline:none;}
+.fsel:focus{border-color:var(--blue);}
+.fdate input{padding:7px 10px;border:1px solid var(--border);border-radius:8px;background:var(--surface);font-size:12px;color:var(--t1);font-family:inherit;outline:none;}
+.fbtn{padding:7px 14px;border-radius:8px;font-size:12px;font-weight:600;font-family:inherit;cursor:pointer;border:none;transition:all 0.15s;white-space:nowrap;}
+.fbtn.pr{background:var(--blue);color:#fff;}
+.fbtn.pr:hover{background:var(--blue2);}
+.fbtn.ou{background:var(--surface);color:var(--t2);border:1px solid var(--border);}
+.fbtn.ou:hover{color:var(--t1);}
+.fbtn.gr{background:var(--green);color:#fff;}
+.fbtn.rd{background:var(--red);color:#fff;}
+.tbl-w{overflow-x:auto;}
+.tbl{width:100%;border-collapse:collapse;}
+.tbl th{text-align:left;padding:9px 14px;font-size:10px;font-weight:600;color:var(--t3);letter-spacing:0.8px;text-transform:uppercase;background:var(--bg);border-bottom:1px solid var(--border);}
+.tbl td{padding:11px 14px;font-size:12px;color:var(--t1);border-bottom:1px solid var(--border);vertical-align:middle;}
+.tbl tr:last-child td{border-bottom:none;}
+.tbl tr:hover td{background:rgba(255,255,255,0.015);}
+.masked{font-family:monospace;letter-spacing:1px;color:var(--t2);}
+.badge{display:inline-flex;align-items:center;gap:4px;padding:3px 8px;border-radius:20px;font-size:10px;font-weight:600;}
+.badge::before{content:'';width:5px;height:5px;border-radius:50%;background:currentColor;flex-shrink:0;}
+.bg{background:var(--green-light);color:var(--green);}
+.bb{background:var(--blue-light);color:var(--blue);}
+.br{background:var(--red-light);color:var(--red);}
+.by{background:var(--yellow-light);color:var(--yellow);}
+.bgr{background:var(--bg3);color:var(--t3);}
+.bp{background:var(--purple-light);color:var(--purple);}
+.acts{display:flex;gap:4px;}
+.act{padding:4px 9px;border-radius:6px;font-size:11px;font-weight:600;font-family:inherit;cursor:pointer;border:none;transition:all 0.15s;}
+.ae{background:var(--bg3);color:var(--t2);}
+.ae:hover{background:var(--blue-light);color:var(--blue);}
+.ad{background:var(--red-light);color:var(--red);}
+.ad:hover{background:var(--red);color:#fff;}
+.aa{background:var(--green-light);color:var(--green);}
+.aa:hover{background:var(--green);color:#fff;}
+.arv{background:var(--yellow-light);color:var(--yellow);}
+.pagi{display:flex;align-items:center;justify-content:space-between;padding:12px 18px;border-top:1px solid var(--border);}
+.pagi-info{font-size:11px;color:var(--t3);}
+.pagi-btns{display:flex;gap:3px;}
+.pbtn{width:28px;height:28px;border-radius:6px;border:1px solid var(--border);background:var(--surface);color:var(--t2);font-size:11px;font-weight:500;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all 0.15s;font-family:inherit;}
+.pbtn.on{background:var(--blue);color:#fff;border-color:var(--blue);}
+.pbtn:hover:not(.on){border-color:var(--border2);color:var(--t1);}
+.bar-chart{display:flex;align-items:flex-end;gap:4px;height:80px;}
+.bar-col{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;}
+.bar{width:100%;border-radius:3px 3px 0 0;transition:all 0.3s;cursor:pointer;min-height:4px;}
+.bar:hover{opacity:0.75;}
+.bar-lbl{font-size:9px;color:var(--t3);}
+.donut-wrap{display:flex;align-items:center;gap:18px;}
+.donut-chart{position:relative;width:110px;height:110px;flex-shrink:0;}
+.donut-chart svg{transform:rotate(-90deg);}
+.donut-center{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;}
+.donut-cn{font-size:20px;font-weight:900;color:var(--t1);line-height:1;}
+.donut-cs{font-size:9px;color:var(--t3);}
+.dleg{display:flex;flex-direction:column;gap:8px;flex:1;}
+.dl-row{display:flex;align-items:center;gap:8px;}
+.dl-dot{width:8px;height:8px;border-radius:2px;flex-shrink:0;}
+.dl-name{font-size:11px;color:var(--t2);flex:1;}
+.dl-pct{font-size:11px;font-weight:700;color:var(--t1);}
+.prog-row{display:flex;align-items:center;gap:10px;margin-bottom:10px;}
+.prog-label{font-size:11px;color:var(--t2);width:60px;flex-shrink:0;}
+.prog-track{flex:1;height:5px;background:var(--bg3);border-radius:3px;overflow:hidden;}
+.prog-fill{height:100%;border-radius:3px;}
+.prog-num{font-size:11px;font-weight:700;color:var(--t1);min-width:30px;text-align:right;}
+.act-item{display:flex;align-items:flex-start;gap:12px;padding:12px 0;border-bottom:1px solid var(--border);}
+.act-item:last-child{border-bottom:none;}
+.act-ic{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0;}
+.act-bd{flex:1;}
+.act-tx{font-size:12px;color:var(--t1);line-height:1.5;margin-bottom:2px;}
+.act-tm{font-size:10px;color:var(--t3);}
+.page-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;}
+.page-hdr-l .pt{font-size:18px;font-weight:900;color:var(--t1);letter-spacing:-0.5px;}
+.page-hdr-l .ps{font-size:12px;color:var(--t3);margin-top:2px;}
+.alert{border-radius:10px;padding:11px 14px;font-size:12px;line-height:1.6;margin-bottom:14px;display:flex;align-items:flex-start;gap:8px;}
+.al-info{background:var(--blue-light);border:1px solid rgba(59,130,246,0.2);color:#93C5FD;}
+.al-warn{background:var(--yellow-light);border:1px solid rgba(245,158,11,0.2);color:#FCD34D;}
+.al-danger{background:var(--red-light);border:1px solid rgba(239,68,68,0.2);color:#FCA5A5;}
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);backdrop-filter:blur(6px);z-index:500;align-items:center;justify-content:center;padding:24px;}
+.modal-overlay.open{display:flex;}
+.modal{background:var(--bg2);border:1px solid var(--border2);border-radius:16px;width:100%;max-width:460px;overflow:hidden;animation:fuUp 0.3s ease;}
+@keyframes fuUp{from{opacity:0;transform:translateY(16px);}to{opacity:1;transform:translateY(0);}}
+.modal-hd{padding:18px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
+.modal-title{font-size:15px;font-weight:700;}
+.modal-x{background:none;border:none;color:var(--t3);font-size:18px;cursor:pointer;}
+.modal-x:hover{color:var(--t1);}
+.modal-body{padding:20px;}
+.modal-ft{padding:14px 20px;border-top:1px solid var(--border);display:flex;gap:8px;justify-content:flex-end;}
+.mwarn{background:var(--red-light);border:1px solid rgba(239,68,68,0.2);border-radius:10px;padding:12px 14px;margin-bottom:14px;font-size:12px;color:#FCA5A5;line-height:1.6;}
+.fgrp{margin-bottom:12px;}
+.flbl{font-size:11px;font-weight:600;color:var(--t2);margin-bottom:5px;display:block;}
+.finp{width:100%;padding:9px 12px;background:var(--bg3);border:1px solid var(--border);border-radius:8px;font-size:13px;font-family:inherit;color:var(--t1);outline:none;transition:border-color 0.2s;}
+.finp:focus{border-color:var(--blue);}
+.finp::placeholder{color:var(--t3);}
+.fsel2{width:100%;padding:9px 12px;background:var(--bg3);border:1px solid var(--border);border-radius:8px;font-size:13px;font-family:inherit;color:var(--t1);outline:none;cursor:pointer;}
+.frow{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.ftxt{width:100%;padding:9px 12px;background:var(--bg3);border:1px solid var(--border);border-radius:8px;font-size:12px;font-family:inherit;color:var(--t1);outline:none;resize:vertical;min-height:76px;}
+.ftxt:focus{border-color:var(--blue);}
+.cfirm-inp{width:100%;padding:10px 12px;background:var(--bg3);border:1px solid var(--border);border-radius:8px;font-size:13px;font-family:inherit;color:var(--t1);outline:none;margin-top:6px;}
+.cfirm-inp:focus{border-color:var(--red);}
+.upload-zone{border:2px dashed var(--border);border-radius:12px;padding:28px;text-align:center;cursor:pointer;transition:all 0.2s;}
+.upload-zone:hover{border-color:var(--blue);background:var(--blue-light);}
+.tog-row{display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border);}
+.tog-row:last-child{border-bottom:none;}
+.tog-nm{font-size:13px;font-weight:500;color:var(--t1);}
+.tog-desc{font-size:11px;color:var(--t3);margin-top:2px;}
+.tog{width:40px;height:22px;border-radius:11px;background:var(--bg3);position:relative;cursor:pointer;transition:background 0.2s;border:none;flex-shrink:0;}
+.tog.on{background:var(--blue);}
+.tog::after{content:'';position:absolute;width:16px;height:16px;border-radius:50%;background:#fff;top:3px;left:3px;transition:transform 0.2s;box-shadow:0 1px 4px rgba(0,0,0,0.3);}
+.tog.on::after{transform:translateX(18px);}
+.steps{display:flex;gap:0;margin-bottom:22px;}
+.step{flex:1;display:flex;flex-direction:column;align-items:center;position:relative;}
+.step::after{content:'';position:absolute;top:15px;left:50%;right:-50%;height:2px;background:var(--border);z-index:0;}
+.step:last-child::after{display:none;}
+.step-c{width:30px;height:30px;border-radius:50%;background:var(--bg3);border:2px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:var(--t3);z-index:1;position:relative;}
+.step.done .step-c{background:var(--green);border-color:var(--green);color:#fff;}
+.step.cur .step-c{background:var(--blue);border-color:var(--blue);color:#fff;}
+.step-lbl{font-size:10px;color:var(--t3);margin-top:5px;text-align:center;}
+.step.cur .step-lbl{color:var(--blue);font-weight:600;}
+.step.done .step-lbl{color:var(--green);}
+.perf-bar{height:5px;border-radius:3px;background:linear-gradient(to right,var(--blue),var(--purple));display:inline-block;}
+.login-wrap{min-height:100vh;background:var(--bg);display:flex;align-items:center;justify-content:center;}
+.login-card{background:var(--bg2);border:1px solid var(--border);border-radius:20px;width:380px;padding:36px;}
+.login-mark{width:52px;height:52px;background:var(--blue);border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:900;color:#fff;margin:0 auto 12px;}
+.login-t{font-size:18px;font-weight:800;color:var(--t1);text-align:center;}
+.login-s{font-size:12px;color:var(--t3);text-align:center;margin-top:4px;margin-bottom:28px;}
+.login-sub{width:100%;padding:13px;background:var(--blue);color:#fff;border:none;border-radius:10px;font-size:14px;font-weight:700;font-family:inherit;cursor:pointer;transition:all 0.18s;margin-top:4px;}
+.login-sub:hover{background:var(--blue2);}
+.otp-boxes{display:flex;gap:8px;justify-content:center;margin:16px 0;}
+.otp-box{width:46px;height:52px;background:var(--bg3);border:2px solid var(--border);border-radius:10px;font-size:20px;font-weight:900;color:var(--t1);text-align:center;outline:none;font-family:inherit;transition:border-color 0.2s;}
+.otp-box:focus{border-color:var(--blue);}
+.toast{position:fixed;bottom:24px;right:24px;background:var(--bg2);border:1px solid var(--border2);color:var(--t1);padding:11px 16px;border-radius:12px;font-size:13px;font-weight:500;opacity:0;transform:translateY(8px);transition:all 0.3s;z-index:600;pointer-events:none;box-shadow:0 8px 28px rgba(0,0,0,0.4);}
+.toast.show{opacity:1;transform:translateY(0);}
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div id="loginScreen" style="display:none;position:fixed;inset:0;z-index:900;background:var(--bg);">
+  <div class="login-wrap">
+    <div id="ls1" class="login-card">
+      <div class="login-mark">050</div>
+      <div class="login-t">통화관리 시스템</div>
+      <div class="login-s">관리자 포털</div>
+      <div class="fgrp"><label class="flbl">이메일</label><input class="finp" type="email" value="admin@050admin.kr"></div>
+      <div class="fgrp"><label class="flbl">비밀번호</label><input class="finp" type="password" value="password123"></div>
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+        <label style="display:flex;align-items:center;gap:6px;font-size:12px;color:var(--t2);cursor:pointer;"><input type="checkbox" checked style="accent-color:var(--blue);"> 로그인 유지</label>
+        <span style="font-size:12px;color:var(--blue);cursor:pointer;">비밀번호 찾기</span>
+      </div>
+      <button class="login-sub" onclick="showOtp()">로그인</button>
+    </div>
+    <div id="ls2" class="login-card" style="display:none;">
+      <div class="login-mark">🔐</div>
+      <div class="login-t">2단계 인증</div>
+      <div class="login-s">등록된 기기로 전송된 6자리 코드를 입력하세요</div>
+      <div class="alert al-info">📱 admin@050admin.kr 로 코드가 발송됐습니다.</div>
+      <div class="otp-boxes">
+        <input class="otp-box" maxlength="1" value="3">
+        <input class="otp-box" maxlength="1" value="8">
+        <input class="otp-box" maxlength="1" value="4">
+        <input class="otp-box" maxlength="1" value="2">
+        <input class="otp-box" maxlength="1" value="1">
+        <input class="otp-box" maxlength="1" value="7">
+      </div>
+      <button class="login-sub" onclick="doLogin()">인증 완료</button>
+      <div style="text-align:center;margin-top:12px;font-size:12px;color:var(--t3);">코드 미수신? <span style="color:var(--blue);cursor:pointer;" onclick="showToast('재발송됐습니다.')">재발송</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- SIDEBAR -->
+<aside class="sidebar">
+  <div class="sb-logo">
+    <div class="sb-logo-mark">050</div>
+    <span class="sb-logo-text">통화관리</span>
+    <span class="sb-logo-badge">ADMIN</span>
+  </div>
+  <nav class="sb-nav">
+    <div class="sb-sec">메인</div>
+    <button class="sb-item active" onclick="go('dashboard',this)">📊 대시보드</button>
+    <div class="sb-sec">운영</div>
+    <button class="sb-item" onclick="go('sites',this)">🏗️ 현장 관리</button>
+    <button class="sb-item" onclick="go('numbers',this)">📞 050 번호 관리 <span class="sb-badge b">3</span></button>
+    <button class="sb-item" onclick="go('employees',this)">👤 사원 관리</button>
+    <button class="sb-item" onclick="go('customers',this)">🙋 고객 관리</button>
+    <div class="sb-sec">로그</div>
+    <button class="sb-item" onclick="go('calllogs',this)">📋 통화/메시지 로그</button>
+    <button class="sb-item" onclick="go('stats',this)">📈 통계 / 다운로드</button>
+    <button class="sb-item" onclick="go('audit',this)">🔍 Audit Log <span class="sb-badge">!</span></button>
+    <div class="sb-sec">관리</div>
+    <button class="sb-item" onclick="go('destroy',this)">🗑️ 개인정보 파기</button>
+    <button class="sb-item" onclick="go('settings',this)">⚙️ 설정</button>
+  </nav>
+  <div class="sb-footer">
+    <div class="sb-user">
+      <div class="sb-av">관</div>
+      <div><div class="sb-un">최고관리자</div><div class="sb-ur">Super Admin</div></div>
+    </div>
+  </div>
+</aside>
+
+<!-- MAIN -->
+<div class="main">
+  <div class="header">
+    <div class="hdr-title" id="hdrTitle">대시보드</div>
+    <div class="hdr-right">
+      <div class="hdr-search"><svg width="13" height="13" viewBox="0 0 20 20" fill="none" stroke="#475569" stroke-width="2"><circle cx="9" cy="9" r="5"/><line x1="13" y1="13" x2="17" y2="17"/></svg><input type="text" placeholder="검색..."></div>
+      <div class="hbtn" onclick="showToast('알림 3건이 있습니다.')">🔔<span class="ndot"></span></div>
+      <div class="hbtn" onclick="showLogin()">🔓</div>
+    </div>
+  </div>
+  <div class="content">
+
+  <!-- DASHBOARD -->
+  <div class="page active" id="page-dashboard">
+    <div class="page-hdr">
+      <div class="page-hdr-l"><div class="pt">대시보드</div><div class="ps">실시간 통화 현황 및 주요 지표</div></div>
+      <div style="display:flex;gap:8px;">
+        <input type="date" value="2026-04-01" style="padding:7px 10px;border:1px solid var(--border);border-radius:8px;background:var(--surface);font-size:12px;color:var(--t1);font-family:inherit;outline:none;">
+        <input type="date" value="2026-04-24" style="padding:7px 10px;border:1px solid var(--border);border-radius:8px;background:var(--surface);font-size:12px;color:var(--t1);font-family:inherit;outline:none;">
+        <select class="fsel"><option>전체 현장</option><option>강남 A현장</option><option>서초 B현장</option></select>
+        <select class="fsel"><option>전체 사원</option><option>김철수</option><option>이영희</option></select>
+        <button class="fbtn pr">조회</button>
+      </div>
+    </div>
+    <div class="kpi-grid">
+      <div class="kpi"><div class="kpi-top"><div class="kpi-icon" style="background:var(--blue-light);">📞</div><span class="trend up">↑ 8.2%</span></div><div class="kpi-num">14,382</div><div class="kpi-label">전체 통화 시도</div></div>
+      <div class="kpi"><div class="kpi-top"><div class="kpi-icon" style="background:var(--green-light);">✅</div><span class="trend up">↑ 3.1%</span></div><div class="kpi-num">87.4%</div><div class="kpi-label">통화 성공률</div></div>
+      <div class="kpi"><div class="kpi-top"><div class="kpi-icon" style="background:var(--yellow-light);">💬</div><span class="trend dn">↓ 1.4%</span></div><div class="kpi-num">1,842</div><div class="kpi-label">알림톡 발송</div></div>
+      <div class="kpi"><div class="kpi-top"><div class="kpi-icon" style="background:var(--red-light);">❌</div><span class="trend dn">↓ 2.8%</span></div><div class="kpi-num">1,820</div><div class="kpi-label">통화 실패</div></div>
+    </div>
+    <div class="g31">
+      <div class="card">
+        <div class="card-hd"><span class="card-title">시간대별 응답 분석</span><button class="card-btn">상세보기</button></div>
+        <div class="card-body"><div class="bar-chart" id="timeChart"></div></div>
+      </div>
+      <div class="card">
+        <div class="card-hd"><span class="card-title">성공/실패 비율</span></div>
+        <div class="card-body">
+          <div class="donut-wrap">
+            <div class="donut-chart">
+              <svg width="110" height="110" viewBox="0 0 110 110">
+                <circle cx="55" cy="55" r="42" fill="none" stroke="#1E2535" stroke-width="16"/>
+                <circle cx="55" cy="55" r="42" fill="none" stroke="#10B981" stroke-width="16" stroke-dasharray="230 264" stroke-dashoffset="0"/>
+                <circle cx="55" cy="55" r="42" fill="none" stroke="#EF4444" stroke-width="16" stroke-dasharray="22 264" stroke-dashoffset="-230"/>
+                <circle cx="55" cy="55" r="42" fill="none" stroke="#F59E0B" stroke-width="16" stroke-dasharray="12 264" stroke-dashoffset="-252"/>
+              </svg>
+              <div class="donut-center"><div class="donut-cn">87%</div><div class="donut-cs">성공률</div></div>
+            </div>
+            <div class="dleg">
+              <div class="dl-row"><div class="dl-dot" style="background:var(--green)"></div><span class="dl-name">성공</span><span class="dl-pct">87.4%</span></div>
+              <div class="dl-row"><div class="dl-dot" style="background:var(--red)"></div><span class="dl-name">실패</span><span class="dl-pct">8.2%</span></div>
+              <div class="dl-row"><div class="dl-dot" style="background:var(--yellow)"></div><span class="dl-name">부재중</span><span class="dl-pct">4.4%</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="g2">
+      <div class="card">
+        <div class="card-hd"><span class="card-title">부재중 알림톡/LMS 발송 현황</span></div>
+        <div class="card-body">
+          <div class="prog-row"><span class="prog-label">알림톡</span><div class="prog-track"><div class="prog-fill" style="width:78%;background:var(--yellow);"></div></div><span class="prog-num">1,436</span></div>
+          <div class="prog-row"><span class="prog-label">LMS</span><div class="prog-track"><div class="prog-fill" style="width:55%;background:var(--blue);"></div></div><span class="prog-num">406</span></div>
+          <div class="prog-row"><span class="prog-label">발송 실패</span><div class="prog-track"><div class="prog-fill" style="width:12%;background:var(--red);"></div></div><span class="prog-num">48</span></div>
+          <div class="prog-row"><span class="prog-label">미전송</span><div class="prog-track"><div class="prog-fill" style="width:5%;background:var(--t3);"></div></div><span class="prog-num">22</span></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-hd"><span class="card-title">최근 활동</span><button class="card-btn">더보기</button></div>
+        <div class="card-body" style="padding:0 16px;">
+          <div class="act-item"><div class="act-ic" style="background:var(--green-light);">✅</div><div class="act-bd"><div class="act-tx"><strong>강남 A현장</strong> 신규 등록 완료</div><div class="act-tm">5분 전</div></div></div>
+          <div class="act-item"><div class="act-ic" style="background:var(--blue-light);">📞</div><div class="act-bd"><div class="act-tx">050-2394-**** 번호 자동 할당</div><div class="act-tm">18분 전</div></div></div>
+          <div class="act-item"><div class="act-ic" style="background:var(--yellow-light);">⚠️</div><div class="act-bd"><div class="act-tx">알림톡 발송 실패 3건</div><div class="act-tm">1시간 전</div></div></div>
+          <div class="act-item"><div class="act-ic" style="background:var(--purple-light);">🔍</div><div class="act-bd"><div class="act-tx"><strong>최고관리자</strong>가 고객 정보 열람</div><div class="act-tm">2시간 전</div></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SITES -->
+  <div class="page" id="page-sites">
+    <div class="page-hdr"><div class="page-hdr-l"><div class="pt">현장 관리</div><div class="ps">총 12개 현장</div></div><button class="fbtn pr" onclick="openM('siteM')">+ 현장 등록</button></div>
+    <div class="fbar"><div class="fi"><input type="text" placeholder="현장명 검색..."></div><select class="fsel"><option>전체 상태</option><option>운영중</option><option>종료</option><option>대기중</option></select><button class="fbtn pr">검색</button></div>
+    <div class="card">
+      <div class="tbl-w"><table class="tbl"><thead><tr><th>현장명</th><th>지역</th><th>할당 번호</th><th>담당 사원</th><th>상태</th><th>시작일</th><th>팝업/레터링</th><th>관리</th></tr></thead><tbody>
+        <tr><td><strong>강남 래미안 A동</strong></td><td>서울 강남구</td><td><code style="color:var(--blue);font-size:11px;">050-2391-4821</code></td><td>김철수</td><td><span class="badge bg">운영중</span></td><td>2026.02.10</td><td><span class="badge bb">설정완료</span></td><td><div class="acts"><button class="act ae" onclick="openM('siteEditM')">수정</button><button class="act ad" onclick="openM('siteEndM')">종료</button></div></td></tr>
+        <tr><td><strong>서초 아크로비스타</strong></td><td>서울 서초구</td><td><code style="color:var(--blue);font-size:11px;">050-3812-9204</code></td><td>이영희</td><td><span class="badge bg">운영중</span></td><td>2026.03.01</td><td><span class="badge by">미설정</span></td><td><div class="acts"><button class="act ae">수정</button><button class="act ad" onclick="openM('siteEndM')">종료</button></div></td></tr>
+        <tr><td><strong>송파 파크리오</strong></td><td>서울 송파구</td><td><code style="color:var(--blue);font-size:11px;">050-4421-3310</code></td><td>박민준</td><td><span class="badge by">대기중</span></td><td>2026.04.15</td><td><span class="badge bb">설정완료</span></td><td><div class="acts"><button class="act ae">수정</button><button class="act ad">종료</button></div></td></tr>
+        <tr><td><strong>마포 공덕 SK</strong></td><td>서울 마포구</td><td>-</td><td>-</td><td><span class="badge bgr">종료</span></td><td>2025.12.01</td><td>-</td><td><div class="acts"><button class="act ae">보기</button></div></td></tr>
+      </tbody></table></div>
+      <div class="pagi"><span class="pagi-info">총 12개 중 1-4 표시</span><div class="pagi-btns"><button class="pbtn">‹</button><button class="pbtn on">1</button><button class="pbtn">2</button><button class="pbtn">3</button><button class="pbtn">›</button></div></div>
+    </div>
+  </div>
+
+  <!-- NUMBERS -->
+  <div class="page" id="page-numbers">
+    <div class="page-hdr"><div class="page-hdr-l"><div class="pt">050 번호 관리</div><div class="ps">전체 80개 · 할당됨 62 · 미사용 15 · 회수됨 3</div></div><div style="display:flex;gap:8px;"><button class="fbtn ou" onclick="showToast('자동 할당 완료.')">🔄 자동 할당</button><button class="fbtn pr" onclick="openM('numM')">+ 번호 등록</button></div></div>
+    <div class="fbar"><div class="fi"><input type="text" placeholder="번호 검색..."></div><select class="fsel"><option>전체 상태</option><option>미사용</option><option>할당됨</option><option>회수됨</option></select><select class="fsel"><option>전체 현장</option><option>강남 A</option><option>서초 B</option></select><button class="fbtn pr">검색</button></div>
+    <div class="card">
+      <div class="tbl-w"><table class="tbl"><thead><tr><th>050 번호</th><th>상태</th><th>할당 현장</th><th>할당 사원</th><th>할당일</th><th>통화 건수</th><th>관리</th></tr></thead><tbody>
+        <tr><td><code style="color:var(--blue);">050-2391-4821</code></td><td><span class="badge bg">할당됨</span></td><td>강남 래미안</td><td>김철수</td><td>2026.02.10</td><td>284</td><td><div class="acts"><button class="act arv" onclick="showToast('번호가 회수됐습니다.')">회수</button></div></td></tr>
+        <tr><td><code style="color:var(--blue);">050-3812-9204</code></td><td><span class="badge bg">할당됨</span></td><td>서초 아크로비스타</td><td>이영희</td><td>2026.03.01</td><td>192</td><td><div class="acts"><button class="act arv" onclick="showToast('번호가 회수됐습니다.')">회수</button></div></td></tr>
+        <tr><td><code style="color:var(--t2);">050-5821-3301</code></td><td><span class="badge bgr">미사용</span></td><td>-</td><td>-</td><td>-</td><td>-</td><td><div class="acts"><button class="act aa" onclick="openM('numAssignM')">할당</button><button class="act ad">삭제</button></div></td></tr>
+        <tr><td><code style="color:var(--t3);">050-4421-3310</code></td><td><span class="badge by">회수됨</span></td><td>마포 공덕 SK</td><td>박민준</td><td>2025.12.01</td><td>448</td><td><div class="acts"><button class="act ae" onclick="showToast('재할당됐습니다.')">재할당</button></div></td></tr>
+      </tbody></table></div>
+      <div class="pagi"><span class="pagi-info">총 80개 중 1-4 표시</span><div class="pagi-btns"><button class="pbtn on">1</button><button class="pbtn">2</button><button class="pbtn">›</button></div></div>
+    </div>
+  </div>
+
+  <!-- EMPLOYEES -->
+  <div class="page" id="page-employees">
+    <div class="page-hdr"><div class="page-hdr-l"><div class="pt">사원 관리</div><div class="ps">총 28명</div></div><button class="fbtn pr" onclick="openM('empM')">+ 사원 등록</button></div>
+    <div class="fbar"><div class="fi"><input type="text" placeholder="사원명 검색..."></div><select class="fsel"><option>전체 상태</option><option>재직</option><option>퇴직</option></select><select class="fsel"><option>전체 권한</option><option>최고관리자</option><option>관리자</option><option>일반</option></select><button class="fbtn pr">검색</button></div>
+    <div class="card">
+      <div class="tbl-w"><table class="tbl"><thead><tr><th>사원명</th><th>이메일</th><th>권한</th><th>할당 번호</th><th>현장</th><th>상태</th><th>관리</th></tr></thead><tbody>
+        <tr><td><strong>김철수</strong></td><td class="masked">kim***@company.kr</td><td><span class="badge bp">관리자</span></td><td><code style="font-size:11px;color:var(--blue);">050-2391-4821</code></td><td>강남 래미안</td><td><span class="badge bg">재직</span></td><td><div class="acts"><button class="act ae" onclick="openM('empEditM')">수정</button><button class="act ad">비활성화</button></div></td></tr>
+        <tr><td><strong>이영희</strong></td><td class="masked">lee***@company.kr</td><td><span class="badge bb">일반</span></td><td><code style="font-size:11px;color:var(--blue);">050-3812-9204</code></td><td>서초 아크로비스타</td><td><span class="badge bg">재직</span></td><td><div class="acts"><button class="act ae">수정</button><button class="act ad">비활성화</button></div></td></tr>
+        <tr><td><strong>박민준</strong></td><td class="masked">park***@company.kr</td><td><span class="badge bb">일반</span></td><td>-</td><td>-</td><td><span class="badge br">퇴직</span></td><td><div class="acts"><button class="act ae">보기</button></div></td></tr>
+      </tbody></table></div>
+      <div class="pagi"><span class="pagi-info">총 28명 중 1-3 표시</span><div class="pagi-btns"><button class="pbtn on">1</button><button class="pbtn">2</button><button class="pbtn">›</button></div></div>
+    </div>
+  </div>
+
+  <!-- CUSTOMERS -->
+  <div class="page" id="page-customers">
+    <div class="page-hdr"><div class="page-hdr-l"><div class="pt">고객 관리</div><div class="ps">개인정보 마스킹 처리</div></div></div>
+    <div class="alert al-info">🔒 고객 상세 정보 열람 시 Audit Log에 기록됩니다.</div>
+    <div class="fbar"><div class="fi"><input type="text" placeholder="고객 검색..."></div><select class="fsel"><option>전체 현장</option><option>강남 A</option></select><button class="fbtn pr">검색</button></div>
+    <div class="card">
+      <div class="tbl-w"><table class="tbl"><thead><tr><th>고객명</th><th>연락처</th><th>현장</th><th>통화 횟수</th><th>최근 상담일</th><th>메모</th><th>상세</th></tr></thead><tbody>
+        <tr><td class="masked">김**(고객)</td><td class="masked">010-****-3821</td><td>강남 래미안</td><td>4회</td><td>2026.04.22</td><td>재건축 문의</td><td><button class="act ae" onclick="openM('custM')">열람</button></td></tr>
+        <tr><td class="masked">이**(고객)</td><td class="masked">010-****-9104</td><td>서초 아크로비스타</td><td>2회</td><td>2026.04.20</td><td>분양 일정 확인</td><td><button class="act ae" onclick="openM('custM')">열람</button></td></tr>
+        <tr><td class="masked">박**(고객)</td><td class="masked">010-****-5530</td><td>강남 래미안</td><td>1회</td><td>2026.04.18</td><td>-</td><td><button class="act ae" onclick="openM('custM')">열람</button></td></tr>
+      </tbody></table></div>
+      <div class="pagi"><span class="pagi-info">총 384명</span><div class="pagi-btns"><button class="pbtn on">1</button><button class="pbtn">2</button><button class="pbtn">›</button></div></div>
+    </div>
+  </div>
+
+  <!-- CALL LOGS -->
+  <div class="page" id="page-calllogs">
+    <div class="page-hdr"><div class="page-hdr-l"><div class="pt">통화 / 메시지 로그</div><div class="ps">전체 통화 기록</div></div><button class="fbtn ou" onclick="showToast('엑셀 다운로드 시작...')">📥 엑셀 다운로드</button></div>
+    <div class="fbar"><div class="fi"><input type="text" placeholder="번호 / 현장 검색..."></div><select class="fsel"><option>전체 상태</option><option>성공</option><option>실패</option><option>부재중</option></select><select class="fsel"><option>전체 메시지</option><option>알림톡</option><option>LMS</option><option>미발송</option></select><input type="date" value="2026-04-24" style="padding:7px 10px;border:1px solid var(--border);border-radius:8px;background:var(--surface);font-size:12px;color:var(--t1);font-family:inherit;outline:none;"><button class="fbtn pr">검색</button></div>
+    <div class="card">
+      <div class="tbl-w"><table class="tbl"><thead><tr><th>일시</th><th>050 번호</th><th>발신(마스킹)</th><th>현장</th><th>통화 상태</th><th>부재중</th><th>알림톡/LMS</th><th>상세</th></tr></thead><tbody>
+        <tr><td style="font-size:11px;color:var(--t3);">04.24 14:22:10</td><td><code style="font-size:11px;color:var(--blue);">050-2391-4821</code></td><td class="masked">010-****-3821</td><td>강남 래미안</td><td><span class="badge bg">성공</span></td><td><span class="badge bgr">-</span></td><td><span class="badge bgr">-</span></td><td><button class="act ae" onclick="openM('logM')">보기</button></td></tr>
+        <tr><td style="font-size:11px;color:var(--t3);">04.24 13:45:02</td><td><code style="font-size:11px;color:var(--blue);">050-3812-9204</code></td><td class="masked">010-****-9104</td><td>서초 아크로비스타</td><td><span class="badge br">실패</span></td><td><span class="badge by">부재중</span></td><td><span class="badge bg">알림톡 발송</span></td><td><button class="act ae" onclick="openM('logM')">보기</button></td></tr>
+        <tr><td style="font-size:11px;color:var(--t3);">04.24 12:10:44</td><td><code style="font-size:11px;color:var(--blue);">050-2391-4821</code></td><td class="masked">010-****-5530</td><td>강남 래미안</td><td><span class="badge bg">성공</span></td><td><span class="badge bgr">-</span></td><td><span class="badge bgr">-</span></td><td><button class="act ae" onclick="openM('logM')">보기</button></td></tr>
+        <tr><td style="font-size:11px;color:var(--t3);">04.24 11:03:28</td><td><code style="font-size:11px;color:var(--blue);">050-4421-3310</code></td><td class="masked">010-****-2201</td><td>송파 파크리오</td><td><span class="badge br">실패</span></td><td><span class="badge by">부재중</span></td><td><span class="badge br">발송실패</span></td><td><button class="act ae" onclick="openM('logM')">보기</button></td></tr>
+      </tbody></table></div>
+      <div class="pagi"><span class="pagi-info">총 14,382건</span><div class="pagi-btns"><button class="pbtn on">1</button><button class="pbtn">2</button><button class="pbtn">3</button><button class="pbtn">›</button></div></div>
+    </div>
+  </div>
+
+  <!-- STATS -->
+  <div class="page" id="page-stats">
+    <div class="page-hdr"><div class="page-hdr-l"><div class="pt">통계 / 다운로드</div><div class="ps">기간별 성과 분석</div></div><button class="fbtn ou" id="dlBtn" onclick="startDl()">📥 엑셀 다운로드</button></div>
+    <div class="g2">
+      <div class="card"><div class="card-hd"><span class="card-title">통화 성공률 추이 (30일)</span></div><div class="card-body"><div class="bar-chart" id="successChart"></div></div></div>
+      <div class="card"><div class="card-hd"><span class="card-title">시간대별 응답률</span></div><div class="card-body"><div class="bar-chart" id="hourChart"></div></div></div>
+    </div>
+    <div class="g2">
+      <div class="card"><div class="card-hd"><span class="card-title">사원별 성과</span></div><div class="tbl-w"><table class="tbl"><thead><tr><th>사원명</th><th>통화</th><th>성공률</th><th>부재중</th><th>성과</th></tr></thead><tbody>
+        <tr><td><strong>김철수</strong></td><td>284</td><td style="color:var(--green);font-weight:700;">91.2%</td><td>14</td><td><div class="perf-bar" style="width:91px;"></div></td></tr>
+        <tr><td><strong>이영희</strong></td><td>192</td><td style="color:var(--green);font-weight:700;">88.6%</td><td>22</td><td><div class="perf-bar" style="width:88px;"></div></td></tr>
+        <tr><td><strong>박민준</strong></td><td>448</td><td style="color:var(--yellow);font-weight:700;">79.4%</td><td>48</td><td><div class="perf-bar" style="width:79px;background:linear-gradient(to right,var(--yellow),var(--green));"></div></td></tr>
+      </tbody></table></div></div>
+      <div class="card"><div class="card-hd"><span class="card-title">현장별 통계</span></div><div class="tbl-w"><table class="tbl"><thead><tr><th>현장명</th><th>통화</th><th>성공률</th><th>알림톡</th></tr></thead><tbody>
+        <tr><td><strong>강남 래미안</strong></td><td>5,482</td><td style="color:var(--green);font-weight:700;">89.2%</td><td>684</td></tr>
+        <tr><td><strong>서초 아크로비스타</strong></td><td>4,102</td><td style="color:var(--green);font-weight:700;">86.1%</td><td>512</td></tr>
+        <tr><td><strong>송파 파크리오</strong></td><td>2,840</td><td style="color:var(--yellow);font-weight:700;">82.3%</td><td>448</td></tr>
+      </tbody></table></div></div>
+    </div>
+  </div>
+
+  <!-- AUDIT -->
+  <div class="page" id="page-audit">
+    <div class="page-hdr"><div class="page-hdr-l"><div class="pt">Audit Log</div><div class="ps">개인정보 조회/수정/삭제 이력</div></div><button class="fbtn ou" onclick="showToast('다운로드 완료')">📥 다운로드</button></div>
+    <div class="alert al-warn">⚠️ 개인정보보호법에 따라 모든 개인정보 열람·수정·삭제 행위는 자동으로 기록됩니다.</div>
+    <div class="fbar"><div class="fi"><input type="text" placeholder="관리자명 / 대상 검색..."></div><select class="fsel"><option>전체 유형</option><option>조회</option><option>수정</option><option>삭제</option><option>관리자 행동</option></select><input type="date" value="2026-04-01" style="padding:7px 10px;border:1px solid var(--border);border-radius:8px;background:var(--surface);font-size:12px;color:var(--t1);font-family:inherit;outline:none;"><input type="date" value="2026-04-24" style="padding:7px 10px;border:1px solid var(--border);border-radius:8px;background:var(--surface);font-size:12px;color:var(--t1);font-family:inherit;outline:none;"><button class="fbtn pr">검색</button></div>
+    <div class="card">
+      <div class="tbl-w"><table class="tbl"><thead><tr><th>일시</th><th>관리자</th><th>행동 유형</th><th>대상</th><th>IP</th><th>비고</th></tr></thead><tbody>
+        <tr><td style="font-size:11px;color:var(--t3);">04.24 14:30:12</td><td>최고관리자</td><td><span class="badge bb">조회</span></td><td class="masked">고객 010-****-3821</td><td style="font-size:11px;color:var(--t3);">192.168.1.100</td><td>업무 열람</td></tr>
+        <tr><td style="font-size:11px;color:var(--t3);">04.24 11:20:44</td><td>김철수</td><td><span class="badge by">수정</span></td><td class="masked">고객 010-****-9104</td><td style="font-size:11px;color:var(--t3);">10.0.0.14</td><td>메모 수정</td></tr>
+        <tr><td style="font-size:11px;color:var(--t3);">04.23 16:44:02</td><td>최고관리자</td><td><span class="badge br">삭제</span></td><td class="masked">고객 010-****-5530</td><td style="font-size:11px;color:var(--t3);">192.168.1.100</td><td>프로젝트 종료 파기</td></tr>
+        <tr><td style="font-size:11px;color:var(--t3);">04.23 09:10:55</td><td>최고관리자</td><td><span class="badge bp">로그인</span></td><td>시스템</td><td style="font-size:11px;color:var(--t3);">192.168.1.100</td><td>2FA 인증 성공</td></tr>
+      </tbody></table></div>
+      <div class="pagi"><span class="pagi-info">총 1,284건</span><div class="pagi-btns"><button class="pbtn on">1</button><button class="pbtn">2</button><button class="pbtn">›</button></div></div>
+    </div>
+  </div>
+
+  <!-- DESTROY -->
+  <div class="page" id="page-destroy">
+    <div class="page-hdr"><div class="page-hdr-l"><div class="pt">개인정보 파기</div><div class="ps">프로젝트 종료 시 수집된 개인정보를 파기합니다</div></div></div>
+    <div class="alert al-danger">🔴 개인정보 파기는 되돌릴 수 없습니다. 법적 검토 후 진행하세요.</div>
+    <div class="steps">
+      <div class="step done"><div class="step-c">✓</div><div class="step-lbl">현장 종료 확인</div></div>
+      <div class="step done"><div class="step-c">✓</div><div class="step-lbl">파기 대상 확인</div></div>
+      <div class="step cur"><div class="step-c">3</div><div class="step-lbl">이중 확인</div></div>
+      <div class="step"><div class="step-c">4</div><div class="step-lbl">파기 완료</div></div>
+    </div>
+    <div class="card">
+      <div class="tbl-w"><table class="tbl"><thead><tr><th>현장명</th><th>종료일</th><th>대상 고객</th><th>통화 로그</th><th>파기 상태</th><th>처리</th></tr></thead><tbody>
+        <tr><td><strong>마포 공덕 SK</strong></td><td>2025.12.31</td><td>128명</td><td>1,284건</td><td><span class="badge by">파기 대기</span></td><td><button class="fbtn rd" style="font-size:11px;padding:5px 10px;" onclick="openM('destroyM')">파기 실행</button></td></tr>
+      </tbody></table></div>
+    </div>
+  </div>
+
+  <!-- SETTINGS -->
+  <div class="page" id="page-settings">
+    <div class="page-hdr"><div class="page-hdr-l"><div class="pt">설정</div><div class="ps">API 연동 및 보안 정책</div></div><button class="fbtn pr" onclick="showToast('설정이 저장됐습니다.')">💾 저장</button></div>
+    <div class="g2">
+      <div class="card"><div class="card-hd"><span class="card-title">세종네트웍스 API 설정</span></div><div class="card-body">
+        <div class="fgrp"><label class="flbl">API 엔드포인트</label><input class="finp" value="https://api.sejong.net/v2/call"></div>
+        <div class="fgrp"><label class="flbl">API Key</label><input class="finp" type="password" value="sk-sejong-****"></div>
+        <div class="fgrp"><label class="flbl">타임아웃 (초)</label><input class="finp" type="number" value="30"></div>
+        <button class="fbtn pr" onclick="showToast('API 연결 테스트 성공! ✅')">🔗 연결 테스트</button>
+      </div></div>
+      <div class="card"><div class="card-hd"><span class="card-title">알림톡 / LMS 설정</span></div><div class="card-body">
+        <div class="fgrp"><label class="flbl">카카오 채널 ID</label><input class="finp" value="@050admin_ch"></div>
+        <div class="fgrp"><label class="flbl">발신번호 (LMS)</label><input class="finp" value="02-1234-5678"></div>
+        <div class="fgrp"><label class="flbl">부재중 템플릿</label><textarea class="ftxt">안녕하세요, 고객님. 전화 연결이 되지 않아 문자를 남깁니다. 빠른 시간 내 연락드리겠습니다.</textarea></div>
+        <button class="fbtn pr" onclick="showToast('테스트 메시지 발송 완료! ✅')">📨 테스트 발송</button>
+      </div></div>
+    </div>
+    <div class="card"><div class="card-hd"><span class="card-title">보안 정책 설정</span></div><div class="card-body">
+      <div class="tog-row"><div><div class="tog-nm">2단계 인증 필수</div><div class="tog-desc">모든 관리자 로그인 시 OTP 인증을 요구합니다</div></div><button class="tog on" onclick="this.classList.toggle('on')"></button></div>
+      <div class="tog-row"><div><div class="tog-nm">세션 자동 만료 (30분)</div><div class="tog-desc">비활성 상태 30분 후 자동 로그아웃됩니다</div></div><button class="tog on" onclick="this.classList.toggle('on')"></button></div>
+      <div class="tog-row"><div><div class="tog-nm">고객정보 열람 시 이중 확인</div><div class="tog-desc">개인정보 조회 전 확인 모달을 표시합니다</div></div><button class="tog on" onclick="this.classList.toggle('on')"></button></div>
+      <div class="tog-row"><div><div class="tog-nm">IP 화이트리스트</div><div class="tog-desc">허용된 IP에서만 접속 가능합니다</div></div><button class="tog" onclick="this.classList.toggle('on')"></button></div>
+      <div class="tog-row"><div><div class="tog-nm">Audit Log 자동 보관 (3년)</div><div class="tog-desc">개인정보 처리 기록을 3년간 보관합니다</div></div><button class="tog on" onclick="this.classList.toggle('on')"></button></div>
+    </div></div>
+  </div>
+
+  </div><!-- /content -->
+</div><!-- /main -->
+
+<!-- MODALS -->
+<div class="modal-overlay" id="siteM" onclick="closeM(event,'siteM')">
+  <div class="modal"><div class="modal-hd"><span class="modal-title">현장 등록</span><button class="modal-x" onclick="closeM(null,'siteM')">✕</button></div>
+  <div class="modal-body">
+    <div class="frow"><div class="fgrp"><label class="flbl">현장명</label><input class="finp" placeholder="예) 강남 래미안 A동"></div><div class="fgrp"><label class="flbl">지역</label><input class="finp" placeholder="예) 서울 강남구"></div></div>
+    <div class="fgrp"><label class="flbl">담당 사원</label><select class="fsel2"><option>사원 선택</option><option>김철수</option><option>이영희</option></select></div>
+    <div class="fgrp"><label class="flbl">팝업 이미지 업로드</label><div class="upload-zone"><div style="font-size:28px;margin-bottom:8px;">🖼️</div><div style="font-size:13px;color:var(--t2);">이미지를 드래그하거나 클릭하여 업로드</div><div style="font-size:11px;color:var(--t3);margin-top:4px;">JPG, PNG · 최대 5MB</div></div></div>
+    <div class="fgrp"><label class="flbl">레터링 문구</label><textarea class="ftxt" placeholder="안녕하세요, ○○ 담당자입니다."></textarea></div>
+  </div>
+  <div class="modal-ft"><button class="fbtn ou" onclick="closeM(null,'siteM')">취소</button><button class="fbtn pr" onclick="closeM(null,'siteM');showToast('현장이 등록됐습니다. ✅')">등록</button></div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="siteEndM" onclick="closeM(event,'siteEndM')">
+  <div class="modal"><div class="modal-hd"><span class="modal-title" style="color:var(--red);">⚠️ 현장 종료 처리</span><button class="modal-x" onclick="closeM(null,'siteEndM')">✕</button></div>
+  <div class="modal-body"><div class="mwarn">현장을 종료하면 할당된 050 번호가 회수되고 통화 연결이 중단됩니다. 이 작업은 되돌릴 수 없습니다.</div>
+  <div class="fgrp"><label class="flbl">확인을 위해 현장명을 입력하세요</label><input class="cfirm-inp" placeholder="강남 래미안 A동"></div></div>
+  <div class="modal-ft"><button class="fbtn ou" onclick="closeM(null,'siteEndM')">취소</button><button class="fbtn rd" onclick="closeM(null,'siteEndM');showToast('현장이 종료됐습니다.')">종료 확인</button></div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="numM" onclick="closeM(event,'numM')">
+  <div class="modal"><div class="modal-hd"><span class="modal-title">050 번호 등록</span><button class="modal-x" onclick="closeM(null,'numM')">✕</button></div>
+  <div class="modal-body"><div class="fgrp"><label class="flbl">050 번호</label><input class="finp" placeholder="050-XXXX-XXXX"></div><div class="fgrp"><label class="flbl">비고</label><input class="finp" placeholder="선택 입력"></div></div>
+  <div class="modal-ft"><button class="fbtn ou" onclick="closeM(null,'numM')">취소</button><button class="fbtn pr" onclick="closeM(null,'numM');showToast('번호가 등록됐습니다. ✅')">등록</button></div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="numAssignM" onclick="closeM(event,'numAssignM')">
+  <div class="modal"><div class="modal-hd"><span class="modal-title">번호 할당</span><button class="modal-x" onclick="closeM(null,'numAssignM')">✕</button></div>
+  <div class="modal-body">
+    <div class="fgrp"><label class="flbl">번호</label><input class="finp" value="050-5821-3301" readonly></div>
+    <div class="fgrp"><label class="flbl">현장</label><select class="fsel2"><option>현장 선택</option><option>강남 래미안</option><option>서초 아크로비스타</option></select></div>
+    <div class="fgrp"><label class="flbl">사원</label><select class="fsel2"><option>사원 선택</option><option>김철수</option><option>이영희</option></select></div>
+  </div>
+  <div class="modal-ft"><button class="fbtn ou" onclick="closeM(null,'numAssignM')">취소</button><button class="fbtn pr" onclick="closeM(null,'numAssignM');showToast('번호가 할당됐습니다. ✅')">할당</button></div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="empM" onclick="closeM(event,'empM')">
+  <div class="modal"><div class="modal-hd"><span class="modal-title">사원 등록</span><button class="modal-x" onclick="closeM(null,'empM')">✕</button></div>
+  <div class="modal-body">
+    <div class="frow"><div class="fgrp"><label class="flbl">사원명</label><input class="finp" placeholder="이름"></div><div class="fgrp"><label class="flbl">이메일</label><input class="finp" type="email" placeholder="email@company.kr"></div></div>
+    <div class="frow"><div class="fgrp"><label class="flbl">권한</label><select class="fsel2"><option>일반</option><option>관리자</option><option>최고관리자</option></select></div><div class="fgrp"><label class="flbl">임시 비밀번호</label><input class="finp" type="password" placeholder="••••••••"></div></div>
+  </div>
+  <div class="modal-ft"><button class="fbtn ou" onclick="closeM(null,'empM')">취소</button><button class="fbtn pr" onclick="closeM(null,'empM');showToast('사원이 등록됐습니다. ✅')">등록</button></div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="empEditM" onclick="closeM(event,'empEditM')">
+  <div class="modal"><div class="modal-hd"><span class="modal-title">사원 수정 / 권한 설정</span><button class="modal-x" onclick="closeM(null,'empEditM')">✕</button></div>
+  <div class="modal-body">
+    <div class="fgrp"><label class="flbl">사원명</label><input class="finp" value="김철수"></div>
+    <div class="fgrp"><label class="flbl">권한 설정</label><select class="fsel2"><option>일반</option><option selected>관리자</option><option>최고관리자</option></select></div>
+    <div class="fgrp"><label class="flbl">상태</label><select class="fsel2"><option selected>재직</option><option>휴직</option><option>퇴직</option></select></div>
+    <div class="fgrp"><label class="flbl">할당 번호</label><input class="finp" value="050-2391-4821" readonly></div>
+  </div>
+  <div class="modal-ft"><button class="fbtn ou" onclick="closeM(null,'empEditM')">취소</button><button class="fbtn pr" onclick="closeM(null,'empEditM');showToast('사원 정보가 수정됐습니다. ✅')">저장</button></div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="custM" onclick="closeM(event,'custM')">
+  <div class="modal" style="max-width:520px;"><div class="modal-hd"><span class="modal-title">고객 상세 정보</span><button class="modal-x" onclick="closeM(null,'custM')">✕</button></div>
+  <div class="modal-body">
+    <div class="alert al-warn" style="margin-bottom:14px;">⚠️ 이 정보 열람은 Audit Log에 기록됩니다.</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px;">
+      <div style="background:var(--bg3);border-radius:8px;padding:10px;"><div style="font-size:10px;color:var(--t3);margin-bottom:3px;">고객명</div><div style="font-size:14px;font-weight:700;">김○○</div></div>
+      <div style="background:var(--bg3);border-radius:8px;padding:10px;"><div style="font-size:10px;color:var(--t3);margin-bottom:3px;">연락처</div><div style="font-size:14px;font-weight:700;">010-****-3821</div></div>
+    </div>
+    <div style="font-size:12px;font-weight:700;margin-bottom:8px;color:var(--t1);">통화 이력</div>
+    <table class="tbl" style="margin-bottom:14px;"><thead><tr><th>일시</th><th>결과</th><th>알림톡</th></tr></thead><tbody>
+      <tr><td style="font-size:11px;">04.22 15:30</td><td><span class="badge bg">성공</span></td><td><span class="badge bgr">-</span></td></tr>
+      <tr><td style="font-size:11px;">04.20 10:12</td><td><span class="badge br">실패</span></td><td><span class="badge bg">발송</span></td></tr>
+    </tbody></table>
+    <div style="font-size:12px;font-weight:700;margin-bottom:8px;color:var(--t1);">상담 메모</div>
+    <textarea class="ftxt" style="margin-bottom:0;">재건축 관련 문의. 이주 일정 확인 필요. 다음 주 재연락 예정.</textarea>
+  </div>
+  <div class="modal-ft"><button class="fbtn ou" onclick="closeM(null,'custM')">닫기</button><button class="fbtn pr" onclick="showToast('메모가 저장됐습니다.')">메모 저장</button></div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="logM" onclick="closeM(event,'logM')">
+  <div class="modal"><div class="modal-hd"><span class="modal-title">통화 로그 상세</span><button class="modal-x" onclick="closeM(null,'logM')">✕</button></div>
+  <div class="modal-body">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+      <div style="background:var(--bg3);border-radius:8px;padding:10px;"><div style="font-size:10px;color:var(--t3);margin-bottom:3px;">일시</div><div style="font-size:12px;font-weight:600;">2026.04.24 14:22:10</div></div>
+      <div style="background:var(--bg3);border-radius:8px;padding:10px;"><div style="font-size:10px;color:var(--t3);margin-bottom:3px;">050 번호</div><div style="font-size:12px;font-weight:600;color:var(--blue);">050-2391-4821</div></div>
+      <div style="background:var(--bg3);border-radius:8px;padding:10px;"><div style="font-size:10px;color:var(--t3);margin-bottom:3px;">통화 상태</div><span class="badge bg">성공</span></div>
+      <div style="background:var(--bg3);border-radius:8px;padding:10px;"><div style="font-size:10px;color:var(--t3);margin-bottom:3px;">통화 시간</div><div style="font-size:12px;font-weight:600;">2분 34초</div></div>
+      <div style="background:var(--bg3);border-radius:8px;padding:10px;"><div style="font-size:10px;color:var(--t3);margin-bottom:3px;">현장</div><div style="font-size:12px;font-weight:600;">강남 래미안 A동</div></div>
+      <div style="background:var(--bg3);border-radius:8px;padding:10px;"><div style="font-size:10px;color:var(--t3);margin-bottom:3px;">알림톡</div><span class="badge bgr">미발송</span></div>
+    </div>
+  </div>
+  <div class="modal-ft"><button class="fbtn ou" onclick="closeM(null,'logM')">닫기</button></div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="destroyM" onclick="closeM(event,'destroyM')">
+  <div class="modal"><div class="modal-hd"><span class="modal-title" style="color:var(--red);">🗑️ 개인정보 파기</span><button class="modal-x" onclick="closeM(null,'destroyM')">✕</button></div>
+  <div class="modal-body">
+    <div class="mwarn">파기 대상: <strong>마포 공덕 SK</strong> 고객 128명의 개인정보 및 통화 로그 1,284건이 영구 삭제됩니다. 복구가 불가능합니다.</div>
+    <div class="fgrp"><label class="flbl">1차 확인 — 아래 문구를 정확히 입력하세요</label><input class="cfirm-inp" placeholder="파기를 승인합니다"></div>
+    <div class="fgrp"><label class="flbl">2차 확인 — 관리자 비밀번호</label><input class="cfirm-inp" type="password" placeholder="••••••••"></div>
+  </div>
+  <div class="modal-ft"><button class="fbtn ou" onclick="closeM(null,'destroyM')">취소</button><button class="fbtn rd" onclick="closeM(null,'destroyM');showToast('개인정보 파기가 완료됐습니다. 🗑️')">파기 실행</button></div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const pageTitles={dashboard:'대시보드',sites:'현장 관리',numbers:'050 번호 관리',employees:'사원 관리',customers:'고객 관리',calllogs:'통화 / 메시지 로그',stats:'통계 / 다운로드',audit:'Audit Log',destroy:'개인정보 파기',settings:'설정'};
+function go(id,btn){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.sb-item').forEach(b=>b.classList.remove('active'));
+  document.getElementById('page-'+id).classList.add('active');
+  btn.classList.add('active');
+  document.getElementById('hdrTitle').textContent=pageTitles[id];
+  if(id==='stats'){buildChart('successChart',[82,85,79,88,91,87,84,86,89,91,88,85,90,87,86,89,92,88,85,87,90,88,85,87,89,91,88,86,87,87],'#10B981',null);buildChart('hourChart',[10,22,45,78,92,88,76,68,72,84,90,86,74,62,48,36,24,14],'#8B5CF6',null);}
+}
+function openM(id){document.getElementById(id).classList.add('open');}
+function closeM(e,id){if(!e||e.target===document.getElementById(id))document.getElementById(id).classList.remove('open');}
+function showLogin(){document.getElementById('loginScreen').style.display='block';document.getElementById('ls1').style.display='block';document.getElementById('ls2').style.display='none';}
+function showOtp(){document.getElementById('ls1').style.display='none';document.getElementById('ls2').style.display='block';}
+function doLogin(){document.getElementById('loginScreen').style.display='none';showToast('로그인됐습니다. 환영합니다! 👋');}
+function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2800);}
+function startDl(){const b=document.getElementById('dlBtn');b.textContent='⏳ 다운로드 중...';b.disabled=true;setTimeout(()=>{b.textContent='✅ 완료';setTimeout(()=>{b.textContent='📥 엑셀 다운로드';b.disabled=false;},2000);showToast('엑셀 파일 다운로드 완료');},2000);}
+function buildChart(id,data,color,labels){
+  const el=document.getElementById(id);if(!el)return;
+  const max=Math.max(...data);
+  el.innerHTML=data.map((v,i)=>`<div class="bar-col"><div class="bar" style="height:${(v/max*100)}%;background:${color};min-height:4px;" title="${v}"></div>${labels?`<div class="bar-lbl">${labels[i]}</div>`:''}</div>`).join('');
+}
+buildChart('timeChart',[12,28,42,86,120,148,182,210,196,168,142,98,72,54,38,22],'#3B82F6',['6','7','8','9','10','11','12','13','14','15','16','17','18','19','20','21']);
+</script>
+</body>
+</html>
